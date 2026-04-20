@@ -6,8 +6,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class LocalizationService {
+
+    private static final Logger LOGGER = Logger.getLogger(LocalizationService.class.getName());
 
     public Map<String, String> getLocalizedStrings(String language) {
         Map<String, String> strings = new HashMap<>();
@@ -26,7 +30,7 @@ public class LocalizationService {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, e, () -> "Error loading localized strings for language: " + language);
         }
 
         if (strings.isEmpty() && !"en".equals(language)) {
