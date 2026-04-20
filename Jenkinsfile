@@ -15,6 +15,9 @@ pipeline {
         DOCKERHUB_REPO = 'kumudun/sonarqube_assignment_5'
         DOCKER_IMAGE_TAG = 'latest'
 
+        DB_USER = 'root'
+        DB_PASSWORD = 'root123'
+
 
     }
     stages{
@@ -26,7 +29,7 @@ pipeline {
 
         stage('build job: '){
             steps {
-                bat  'mvn clean install'
+                bat 'mvn clean compile'
             }
         }
 
