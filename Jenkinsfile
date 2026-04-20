@@ -29,7 +29,7 @@ pipeline {
 
         stage('build job: '){
             steps {
-                bat 'mvn clean compile'
+                bat 'mvn clean test-compile'
             }
         }
 
