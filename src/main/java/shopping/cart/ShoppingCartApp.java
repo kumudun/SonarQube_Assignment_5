@@ -18,9 +18,11 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class ShoppingCartApp extends Application {
@@ -112,7 +114,7 @@ public class ShoppingCartApp extends Application {
         private final CartCalculator calculator = new CartCalculator();
         private final CartService cartService = new CartService();
         private final LocalizationService localizationService = new LocalizationService();
-        private final DecimalFormat df = new DecimalFormat("0.00");
+        private final DecimalFormat df = new DecimalFormat("0.00", DecimalFormatSymbols.getInstance(Locale.US));
 
         private Map<String, String> localizedTexts = new HashMap<>();
 
