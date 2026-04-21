@@ -2,34 +2,40 @@ pipeline {
     agent any
 
     tools {
-
         maven 'Maven 3'
-
     }
+
     environment {
         PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;${env.PATH}"
-        JAVA_HOME =  "C:\\Program Files\\Eclipse Adoptium\\jdk-21.0.10.7-hotspot"
+        JAVA_HOME = "C:\\Program Files\\Eclipse Adoptium\\jdk-21.0.10.7-hotspot"
+
         SONARQUBE_SERVER = 'SonarQubeServer'
         SONAR_TOKEN = credentials('SONAR_TOKEN')
+
         DOCKERHUB_CREDENTIALS_ID = 'Docker-Hub'
         DOCKERHUB_REPO = 'kumudun/sonarqube_assignment_5'
         DOCKER_IMAGE_TAG = 'latest'
 
         DB_USER = 'root'
         DB_PASSWORD = 'root123'
-
-
     }
-    stages{
-        stage('check'){
+
+    stages {
+        stage('check') {
             steps {
                 git branch: 'main', url: 'https://github.com/kumudun/SonarQube_Assignment_5.git'
             }
         }
 
-        stage('build job: '){
+        stage('build job') {
             steps {
-                bat 'mvn clean test-compile'
+                bat 'mvn clean test'
+            }
+        }
+
+        stage('Report') {
+            steps {
+                bat 'mvn jacoco:report'
             }
         }
 
@@ -37,28 +43,18 @@ pipeline {
             steps {
                 withSonarQubeEnv('SonarQubeServer') {
                     bat """
-                ${tool 'SonarScanner'}\\bin\\sonar-scanner ^
-                -Dsonar.projectKey=assignment5 ^
-                -Dsonar.projectName=Assignment_5 ^
-                -Dsonar.projectVersion=1.0 ^
-                -Dsonar.sources=src/main/java ^
-                -Dsonar.tests=src/test/java ^
-                -Dsonar.java.binaries=target/classes ^
-                -Dsonar.java.test.binaries=target/test-classes ^
-                -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
-            """
+                        ${tool 'SonarScanner'}\\bin\\sonar-scanner ^
+                        -Dsonar.projectKey=assignment5 ^
+                        -Dsonar.projectName=Assignment_5 ^
+                        -Dsonar.projectVersion=1.0 ^
+                        -Dsonar.sources=src/main/java ^
+                        -Dsonar.tests=src/test/java ^
+                        -Dsonar.java.binaries=target/classes ^
+                        -Dsonar.java.test.binaries=target/test-classes ^
+                        -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml ^
+                        -Dsonar.login=%SONAR_TOKEN%
+                    """
                 }
-            }
-        }
-
-        stage('test'){
-            steps {
-                bat 'mvn test'
-            }
-        }
-        stage('Report'){
-            steps {
-                bat 'mvn jacoco:report'
             }
         }
 
@@ -67,6 +63,7 @@ pipeline {
                 junit '**/target/surefire-reports/*.xml'
             }
         }
+
         stage('Publish Coverage Report') {
             steps {
                 jacoco()
@@ -90,8 +87,5 @@ pipeline {
                 }
             }
         }
-
-
-
     }
 }
